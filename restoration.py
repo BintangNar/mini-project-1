@@ -166,12 +166,12 @@ image = cv.imread("bahan/test_image_lena_noisy.png")
 img_h, img_w = image.shape[:2]
 
 #process
-step1 = median_filter(image,5)
+step1 = median_filter(image,3)
 step2 = gaussian_filter(step1,3)
 step3 = histogram_equalization(step2)
 step4 = median_filter(step3,3)
 edge = sobel(step4)
-step5 = step4.astype(np.float32) + (0.15 * edge.astype(np.float32))
+step5 = step4.astype(np.float32) + (0.2 * edge.astype(np.float32))
 step5 = np.clip(step5,0,255).astype(np.uint8)
 final = unsharp_mask(step5,1.2,25)
 
