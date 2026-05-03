@@ -15,7 +15,9 @@ Proses restorasi citra ini menggunakan pendekatan sekuensial yang menggabungkan 
 
 ## 2. Perbandingan Visual
 
-| Sebelum (Noisy Source) | Sesudah (Restoration Result) |
+| Sebelum (Noisy Source) | Sesudah (Restoration Result) | Target Restorasi |
+| :---: | :---: | :---: |
+| ![Noisy](bahan\test_image_lena_noisy.png) | ![Result](results\resuls.png) |![Result](bahan\test_image_lena_ori.png)
 
 
 ## 3. Analisis Singkat
