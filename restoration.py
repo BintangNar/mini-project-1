@@ -84,13 +84,6 @@ def median_filter(image,size=3):
     
     return np.clip(output,0,255).astype(np.uint8)
 
-def fix_contrast(image):
-    c_min = np.min(image, axis=(0, 1))
-    c_max = np.max(image, axis=(0, 1))
-    
-    # Formula applied to the whole 3D array at once
-    stretched = (image - c_min) * (255.0 / (c_max - c_min))
-    return np.clip(stretched, 0, 255).astype(np.uint8)
 
 def histogram_equalization(image):
     # 1. Convert RGB to Y (Luminance) manually
@@ -132,34 +125,15 @@ def sharpening(image,size=3):
 
     return np.clip(output,0,255).astype(np.uint8)
 
-def unsharp_mask(image, amount=1.2, threshold=20):
-    blurred = gaussian_filter(image)
+def unsharp_mask(img, ksize=5, alpha=0.8, threshold=15): 
+    blurred = gaussian_filter(img, ksize)
     
-    mask = image.astype(np.float32) - blurred.astype(np.float32)
+    mask = img.astype(np.float32) - blurred.astype(np.float32)
     
-    sharp_mask = np.where(np.abs(mask) > threshold, mask, 0)
+    mask[np.abs(mask) < threshold] = 0
     
-    sharpened = image.astype(np.float32) + (amount * sharp_mask)
+    sharpened = img.astype(np.float32) + alpha * mask
     return np.clip(sharpened, 0, 255).astype(np.uint8)
-
-def sobel(image):
-    # Kernels
-    Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-    Ky = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
-    
-    pad = 1
-    padded = np.pad(image, ((pad, pad), (pad, pad), (0, 0)), mode='edge')
-    edge_map = np.zeros_like(image, dtype=np.float32)
-    
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            for c in range(image.shape[2]):
-                region = padded[i:i+3, j:j+3, c]
-                gx = np.sum(region * Kx)
-                gy = np.sum(region * Ky)
-                edge_map[i, j, c] = np.sqrt(gx**2 + gy**2)
-                
-    return edge_map
 
 #input
 image = cv.imread("bahan/test_image_lena_noisy.png")
@@ -169,12 +143,9 @@ img_h, img_w = image.shape[:2]
 step1 = median_filter(image,3)
 step2 = gaussian_filter(step1,3)
 step3 = histogram_equalization(step2)
-step4 = median_filter(step3,3)
-edge = sobel(step4)
-step5 = step4.astype(np.float32) + (0.2 * edge.astype(np.float32))
-step5 = np.clip(step5,0,255).astype(np.uint8)
-final = unsharp_mask(step5,1.2,25)
-
+step4 = median_filter(step3,5)
+step5 = gaussian_filter(step4)
+step6 = unsharp_mask(step5)
 
 #result show
 cv.imshow("origin", image)
@@ -183,8 +154,7 @@ cv.imshow("step2", step2)
 cv.imshow("step3", step3)
 cv.imshow("step4", step4)
 cv.imshow("step5", step5)
-cv.imshow("final", final)
-
+cv.imshow("step6", step6)
 # Menunggu sampai tombol di tekan
 cv.waitKey(0)
  
